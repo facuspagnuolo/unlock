@@ -62,8 +62,6 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
   // A count of how many new key purchases there have been
   uint public numberOfKeysSold;
 
-  // The tokenID counter keeps track of the last ID # that was assigned
-  uint public currentTokenID;
 
   // Keys
   // Each owner can have at most exactly one key
@@ -120,7 +118,7 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
     uint _tokenId
   ) {
     require(
-      ownerByTokenId[_tokenId] == msg.sender
+      ownerByTokenId[_tokenId] == msg.sender, "Not the key owner"
     );
     _;
   }
@@ -219,7 +217,7 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
     hasValidKey(_from)
     onlyKeyOwnerOrApproved(_tokenId)
   {
-    require(_recipient != address(0));
+    require(_recipient != address(0), "Can't Transfer to 0x Address");
 
     uint previousExpiration = keyByOwner[_recipient].expirationTimestamp;
 
@@ -227,6 +225,7 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
       // The recipient did not have a key previously
       owners.push(_recipient);
       ownerByTokenId[_tokenId] = _recipient;
+      keyByOwner[_recipient].tokenId = _tokenId;
     }
 
     if (previousExpiration <= now) {
@@ -525,7 +524,7 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
     internal
     notSoldOut()
   { // solhint-disable-line function-max-lines
-    require(_recipient != address(0));
+    require(_recipient != address(0), "Can't Purchase For 0x Address");
 
     // Let's get the actual price for the key from the Unlock smart contract
     IUnlock unlock = IUnlock(unlockProtocol);
@@ -551,17 +550,16 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
     uint previousExpiration = keyByOwner[_recipient].expirationTimestamp;
     if (previousExpiration < now) {
       if (previousExpiration == 0) {
-        // This is a brand new owner, else an owner of an expired key buying an extension
-        numberOfKeysSold++;
+        // This is a brand new owner, else an owner of an expired key buying an extension.
         // We increment the tokenId counter
-        currentTokenID++;
+        numberOfKeysSold++;
         owners.push(_recipient);
         // We register the owner of the new tokenID
-        ownerByTokenId[currentTokenID] = _recipient;
-        // we assign the incremented `currentTokenID` as the tokenId for the new key
-        keyByOwner[_recipient].tokenId = currentTokenID;
+        ownerByTokenId[numberOfKeysSold] = _recipient;
+        // we assign the incremented `numberOfKeysSold` as the tokenId for the new key
+        keyByOwner[_recipient].tokenId = numberOfKeysSold;
       }
-      // SafeAdd is not required here since expirationDuration is capped to a tiny value 
+      // SafeAdd is not required here since expirationDuration is capped to a tiny value
       // (relative to the size of a uint)
       keyByOwner[_recipient].expirationTimestamp = now + expirationDuration;
     } else {
@@ -581,7 +579,7 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
     emit Transfer(
       address(0), // This is a creation.
       _recipient,
-      currentTokenID
+      numberOfKeysSold
     );
   }
 
@@ -598,7 +596,7 @@ contract PublicLock is ILockCore, ERC165, IERC721, IERC721Receiver, Ownable {
     returns (address)
   {
     address approvedRecipient = approved[_tokenId];
-    require(approvedRecipient != address(0));
+    require(approvedRecipient != address(0), "No Approval Exists");
     return approvedRecipient;
   }
 
