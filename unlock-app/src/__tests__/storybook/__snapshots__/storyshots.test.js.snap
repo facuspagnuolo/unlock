@@ -22997,6 +22997,25 @@ Object {
   width: 72px;
 }
 
+.c34 {
+  display: grid;
+  grid-gap: 16px;
+}
+
+.c34 > h1 {
+  font-weight: bold;
+  color: var(--grey);
+  margin: 0px;
+  padding: 0px;
+}
+
+.c34 > p {
+  margin: 0px;
+  padding: 0px;
+  font-size: 16px;
+  color: var(--dimgrey);
+}
+
 .c24 {
   display: grid;
   grid-gap: 32px;
@@ -23072,29 +23091,6 @@ Object {
   -webkit-align-self: end;
   -ms-flex-item-align: end;
   align-self: end;
-}
-
-.c34 {
-  display: grid;
-  grid-gap: 16px;
-}
-
-.c34 > h1 {
-  font-weight: bold;
-  color: var(--red);
-  margin: 0px;
-  padding: 0px;
-}
-
-.c34 > p {
-  margin: 0px;
-  padding: 0px;
-  font-size: 16px;
-  color: var(--dimgrey);
-}
-
-.c34 > h1 {
-  color: var(--grey);
 }
 
 @media only screen and (min-device-width:0px) and (max-device-width:736px) {
@@ -23970,7 +23966,7 @@ Object {
               src="/static/images/illustrations/lock.svg"
             />
             <div
-              class="sc-1g6piw8-2 sc-1olgoav-7 gnuxTK"
+              class="sc-1g6piw8-2 evbCld"
             >
               <h1>
                 Create a lock to get started

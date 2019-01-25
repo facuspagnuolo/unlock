@@ -10,7 +10,7 @@ import CreatorLockForm from './CreatorLockForm'
 import Errors from '../interface/Errors'
 import Media, { NoPhone, Phone } from '../../theme/media'
 import { createLock } from '../../actions/lock'
-import { Container, Image, Message } from './FatalError'
+import { DefaultError } from './FatalError'
 
 export class CreatorLocks extends React.Component {
   constructor(props, context) {
@@ -59,16 +59,16 @@ export class CreatorLocks extends React.Component {
             return <CreatorLock key={JSON.stringify(lock)} lock={lock} />
           })}
         {lockFeed.length === 0 && !showDashboardForm && (
-          <Container>
-            <Image src="/static/images/illustrations/lock.svg" />
-            <DimMessage>
-              <h1>Create a lock to get started</h1>
-              <p>
-                If you have already created some locks, they should appear here
-                momentarily.
-              </p>
-            </DimMessage>
-          </Container>
+          <DefaultError
+            illustration="/static/images/illustrations/lock.svg"
+            title="Create a lock to get started"
+            critical={false}
+          >
+            <p>
+              If you have already created some locks, they should appear here
+              momentarily.
+            </p>
+          </DefaultError>
         )}
       </Locks>
     )
@@ -163,10 +163,4 @@ const CreateButton = styled(ActionButton)`
   ${Media.phone`
     display: none;
   `};
-`
-
-const DimMessage = styled(Message)`
-  & > h1 {
-    color: var(--grey);
-  }
 `
