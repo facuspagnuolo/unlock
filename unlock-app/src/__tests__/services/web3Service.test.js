@@ -300,7 +300,8 @@ describe('Web3Service', () => {
     describe('refreshOrGetAccount', () => {
       describe('when no account was passed but the node has an unlocked account', () => {
         it('should load a local account with the right balance', done => {
-          expect.assertions(2)
+          expect.assertions(3)
+          jest.useFakeTimers()
           const unlockAccountsOnNode = [
             '0xaaadeed4c0b861cb36f4ce006a9c90ba2e43fdc2',
           ]
@@ -313,6 +314,10 @@ describe('Web3Service', () => {
 
           web3Service.once('ready', () => {
             expect(web3Service.ready).toBe(true)
+            expect(setTimeout).toHaveBeenCalledWith(
+              web3Service.pollAccount,
+              500
+            )
             done()
           })
 
