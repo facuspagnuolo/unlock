@@ -12,7 +12,7 @@ import {
   NOT_ENABLED_IN_PROVIDER,
 } from '../errors'
 
-const { providers, unlockAddress, blockTime } = configure()
+const { providers, unlockAddress, blockTime, isServer } = configure()
 
 export const keyId = (lock, owner) => [lock, owner].join('-')
 
@@ -41,6 +41,8 @@ export default class Web3Service extends EventEmitter {
     this.ready = false
     this.provider = null
     this.web3 = null
+    this.account = null
+    this.pollAccount = this.pollAccount.bind(this)
     this.eventsHandlers = {
       NewLock: (transactionHash, contractAddress, args) => {
         return this.emit(
@@ -135,6 +137,23 @@ export default class Web3Service extends EventEmitter {
     })
   }
 
+  pollAccount() {
+    if (isServer) return
+    this.web3.eth.getAccounts().then(accounts => {
+      if (!accounts.length) {
+        this.account = null
+        this.emit('account.changed', null)
+        setTimeout(this.pollAccount, 500)
+      } else {
+        if (this.account.address !== accounts[0]) {
+          this.refreshOrGetAccount(accounts[0])
+        } else {
+          setTimeout(this.pollAccount, 500)
+        }
+      }
+    })
+  }
+
   /**
    * Function which refreshes the account supplied or loads one from the local node or creates
    * one.
@@ -160,6 +179,9 @@ export default class Web3Service extends EventEmitter {
     return getAccountPromise.then(account => {
       return this.getAddressBalance(account.address).then(balance => {
         account.balance = balance
+        this.account = account
+        setTimeout(this.pollAccount, 500)
+
         this.emit('account.changed', account)
         this.emit('ready')
 
