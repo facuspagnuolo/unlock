@@ -22,7 +22,7 @@
     "truffle-hdwallet-provider": "^1.0.2",
     "web3-utils": "^1.0.0-beta.36",
     "zos": "^2.1.0",
-    "zos-lib": "^2.1.0"
+    "zos-lib": "^2.1.1"
   },
   "devDependencies": {
     "remix-ide": "^0.7.5",
